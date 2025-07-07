@@ -15,6 +15,10 @@ if [ ! -d "/srv/git/testrepo.git" ]; then
   rm -rf /tmp/tmprepo
 fi
 
+# Fix permissions
+chown -R www-data:www-data /srv/git
+chmod -R 755 /srv/git
+
 # Apache Config
 cat >/etc/apache2/sites-available/000-default.conf <<EOF
 <VirtualHost *:80>
@@ -23,12 +27,23 @@ cat >/etc/apache2/sites-available/000-default.conf <<EOF
 
     SetEnv GIT_PROJECT_ROOT /srv/git
     SetEnv GIT_HTTP_EXPORT_ALL
+
     ScriptAlias /git/ /usr/lib/git-core/git-http-backend/
+
+    <Directory "/usr/lib/git-core">
+        Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        Require all granted
+    </Directory>
+
+    <Directory "/srv/git">
+        Require all granted
+    </Directory>
 </VirtualHost>
 EOF
 
-# https://git-scm.com/docs/git-daemon
+a2enmod cgi
+a2ensite 000-default
+
 touch /srv/git/testrepo.git/git-daemon-export-ok
 
-# Starte Apache im Vordergrund
 apachectl -D FOREGROUND
