@@ -12,6 +12,7 @@ if [ ! -d "/srv/git/testrepo.git" ]; then
   git add README.md
   git commit -m "Initial commit"
   git push origin master
+  cd
   rm -rf /tmp/tmprepo
 fi
 
