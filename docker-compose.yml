@@ -1,0 +1,22 @@
+services:
+  d1:
+    build:
+      context: ./D1
+    container_name: d1
+    hostname: d1
+    networks:
+      - gitnet
+
+  d2:
+    build:
+      context: ./D2
+    container_name: d2
+    hostname: d2
+    depends_on:
+      - d1
+    networks:
+      - gitnet
+
+networks:
+  gitnet:
+    driver: bridge
